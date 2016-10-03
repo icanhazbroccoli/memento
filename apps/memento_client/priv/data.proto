@@ -1,0 +1,8 @@
+package memento;
+
+message Note {
+  required string   uuid      = 1;
+  required string   client_id = 2;
+  required sfixed64 timestamp = 3;
+  required string   body      = 4;
+}
