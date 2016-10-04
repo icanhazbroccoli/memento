@@ -3,7 +3,9 @@ defmodule MementoClient.Server do
   alias MementoClient.Proto
 
   @socket_path "/tmp/memento.sock"
-  @server_url  "http://127.0.0.1:9876/proto"
+  @server_url  "http://127.0.0.1:9876"
+  @notes_path  "/notes"
+  @ping_path   "/ping"
   
   def is_running? do
     #TODO: this works only if the server and

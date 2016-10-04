@@ -1,8 +1,27 @@
 package memento;
 
+enum StatusCode {
+  OK = 1;
+  NOT_OK = 2;
+}
 message Note {
   required string   uuid      = 1;
   required string   client_id = 2;
   required sfixed64 timestamp = 3;
   required string   body      = 4;
+}
+message PingRequest {
+  required sfixed64 ping_timestamp = 1;
+}
+message PongResponse {
+  required sfixed64 ping_timestamp = 1;
+  required sfixed64 pong_timestamp = 2;
+}
+message NoteCreateRequest {
+  required Note     note      = 1;
+  required sfixed64 timestamp = 2;
+}
+message NoteCreateResponse {
+  required StatusCode status_code = 1;
+  required sfixed64   timestamp   = 2;
 }
