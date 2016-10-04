@@ -2,23 +2,26 @@ defmodule MementoClient.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :memento_client,
-     version: "0.1.0",
-     build_path: "../../_build",
-     config_path: "../../config/config.exs",
-     deps_path: "../../deps",
-     lockfile: "../../mix.lock",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps]
+    [
+      app: :memento_client,
+      version: "0.1.0",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps,
+      escript: [main_module: MementoClient],
+    ]
   end
 
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :timex]]
+    [applications: [:logger, :httpoison]]
   end
 
   # Dependencies can be Hex packages:
@@ -38,7 +41,7 @@ defmodule MementoClient.Mixfile do
     [
       {:exprotobuf, "~> 1.2"},
       {:uuid, "~> 1.1"},
-      {:timex, "~> 3.0"},
+      {:httpoison, "~> 0.9.2"},
     ]
   end
 end
