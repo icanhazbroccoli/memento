@@ -2,7 +2,7 @@ defmodule MementoClient.Server do
 
   alias MementoClient.Proto
 
-  @socket_path "/tmp/memento.sock"
+  @lock_path "/tmp/memento.lock"
   @server_url  "http://127.0.0.1:9876"
   @notes_path  "/notes"
   @ping_path   "/ping"
@@ -12,7 +12,7 @@ defmodule MementoClient.Server do
     # the client are at the same machine.
     # Should use ping instead for remote
     # services.
-    File.exists?(@socket_path)
+    File.exists?(@lock_path)
   end
 
   def ping(cb) do

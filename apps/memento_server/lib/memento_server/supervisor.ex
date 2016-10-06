@@ -1,5 +1,5 @@
 defmodule MementoServer.Supervisor do
-  use Supervisor
+  import Supervisor.Spec
 
   def start_link do
     Supervisor.start_link(__MODULE__, [])
@@ -7,7 +7,7 @@ defmodule MementoServer.Supervisor do
 
   def init([]) do
     children= [
-      Plug.Adapters.Cowboy.child_spec(:http, MementoServer.HTTP, [], [port: 9876])
+      Plug.Adapters.Cowboy.child_spec(:http, MementoServer.HTTP, [], [port: 9876]),
     ]
     supervise(children, strategy: :one_for_one)
   end
