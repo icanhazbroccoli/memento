@@ -23,7 +23,6 @@ defmodule MementoServerProtoTest do
     datetime= {{2016, 10, 12}, {7, 15, 35}}
     msg= %{} |> Proto.put_timestamp(:my_timestamp, datetime)
     assert Map.get(msg, :my_timestamp, 0) == (datetime |> :calendar.datetime_to_gregorian_seconds)
-    
   end
 
 

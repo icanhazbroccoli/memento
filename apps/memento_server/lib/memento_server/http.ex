@@ -6,17 +6,17 @@ defmodule MementoServer.HTTP do
   #  plug :super
   #end
 
+  plug Plug.Logger
   plug :match
   plug :dispatch
-  plug :copy_req_body
-  plug Plug.Logger
+  # plug :copy_req_body
 
   use Plug.Debugger
 
-  defp copy_req_body(conn, _) do
-    {:ok, body, _}= Plug.Conn.read_body(conn)
-    Plug.Conn.put_private(conn, :req_body, body)
-  end
+  #defp copy_req_body(conn, _) do
+  #  {:ok, body, _}= Plug.Conn.read_body(conn)
+  #  Plug.Conn.put_private(conn, :req_body, body)
+  #end
 
   post "/notes/new" do
     conn.private[:req_body]
@@ -25,17 +25,24 @@ defmodule MementoServer.HTTP do
   end
 
   post "/ping" do
-    conn.private[:req_body]
+    {:ok, body, conn}= Plug.Conn.read_body(conn)
+    body
       |> Proto.PingRequest.decode
       |> dispatch_msg(conn)
   end
 
-  def dispatch_msg(req= %Proto.PingRequest{}, conn) do
-    send_resp(conn, 200, Proto.PongResponse.new(
-      #FIXME: get the timestamp from the request
-      ping_timestamp: :calendar.universal_time |> :calendar.datetime_to_gregorian_seconds,
-      pong_timestamp: :calendar.universal_time |> :calendar.datetime_to_gregorian_seconds
-    ) |> :erlang.term_to_binary)
+  def dispatch_msg(req= %Proto.PingRequest{ping_timestamp: ping_timestamp}, conn) do
+    pong_timestamp= :calendar.universal_time
+    resp= Proto.PongResponse.new()
+          |> Proto.put_timestamp(:ping_timestamp, ping_timestamp |> :calendar.gregorian_seconds_to_datetime)
+          |> Proto.put_timestamp(:pong_timestamp, pong_timestamp)
+          |> Proto.PongResponse.encode
+    send_resp(conn, 200, resp)
+  end
+
+  def _inspect(obj) do
+    IO.inspect obj
+    obj
   end
 
   def dispatch_msg(req= %Proto.NoteCreateRequest{}, conn) do
