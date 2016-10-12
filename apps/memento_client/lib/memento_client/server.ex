@@ -2,21 +2,19 @@ defmodule MementoClient.Server do
 
   alias MementoClient.Proto
 
-  @lock_path "/tmp/memento.lock"
   @server_url  "http://127.0.0.1:9876"
-  @notes_path  "/notes"
-  @ping_path   "/ping"
   
   def is_running? do
     #TODO: this works only if the server and
     # the client are at the same machine.
     # Should use ping instead for remote
     # services.
-    File.exists?(@lock_path)
+    # File.exists?(@lock_path)
+    true
   end
 
   def ping(cb) do
-    send_message(Proto.Ping.new(), cb)
+    send_message(Proto.PingRequest.new(), cb)
   end
 
   def send_data(data, cb) do
