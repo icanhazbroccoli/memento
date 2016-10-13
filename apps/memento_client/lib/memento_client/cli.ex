@@ -21,17 +21,18 @@ defmodule MementoClient.CLI do
   end
 
   def proceed({stream, opts}) do
-    #TODO
     body= stream
       |> Enum.reduce(fn(line, acc) ->
         acc <> line
       end)
+
     # FIXME: implement client ID fetching from the app config
     note= Proto.Note.new(
       body: body,
       client_id: "Some dummy client id"
     ) |> Proto.put_uuid
       |> Proto.put_timestamp
+
     case Server.is_running? do
       false -> raise "Server seems to be down."
       true  ->

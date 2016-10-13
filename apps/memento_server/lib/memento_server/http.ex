@@ -18,6 +18,11 @@ defmodule MementoServer.HTTP do
   #  Plug.Conn.put_private(conn, :req_body, body)
   #end
 
+  post "/notes" do
+    {:ok, body, conn}= Plug.Conn.read_body(conn)
+    #TODO
+  end
+
   post "/notes/new" do
     {:ok, body, conn}= Plug.Conn.read_body(conn)
     body

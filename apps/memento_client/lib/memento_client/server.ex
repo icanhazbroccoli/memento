@@ -45,7 +45,7 @@ defmodule MementoClient.Server do
   defp send_message(path, message, cb) do
     resp= HTTPoison.post("#{@server_url}#{path}", message)
     case resp do
-      %HTTPoison.Response{status_code: status, body: body} ->
+      {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
         # success!
         cb.({:ok, body})
       _ ->
