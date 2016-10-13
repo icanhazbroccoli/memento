@@ -19,7 +19,8 @@ defmodule MementoServer.HTTP do
   #end
 
   post "/notes/new" do
-    conn.private[:req_body]
+    {:ok, body, conn}= Plug.Conn.read_body(conn)
+    body
       |> Proto.NoteCreateRequest.decode
       |> dispatch_msg(conn)
   end
@@ -46,9 +47,12 @@ defmodule MementoServer.HTTP do
   end
 
   def dispatch_msg(req= %Proto.NoteCreateRequest{}, conn) do
-    send_resp(conn, 200, Proto.NoteCreateResponse.new(
-      status_code: Proto.StatusCode.OK
-    ) |> Proto.put_timestamp |> :erlang.term_to_binary)
+    #TODO
+    resp= Proto.NoteCreateResponse.new(
+      status_code: Proto.StatusCode.value(:OK)
+    ) |> Proto.put_timestamp
+      |> Proto.NoteCreateResponse.encode
+    send_resp(conn, 200, resp)
   end
 
   def dispatch_msg(_, conn) do

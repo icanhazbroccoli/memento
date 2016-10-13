@@ -3,6 +3,8 @@ defmodule MementoServerHTTPTest do
   use Plug.Test
   alias MementoServer.Proto
 
+  import MementoServer.TestHelper, only: [a_uuid: 0, a_string: 0, a_string: 1]
+
   @opts MementoServer.HTTP.init([])
 
   test "ping proto" do
@@ -18,6 +20,24 @@ defmodule MementoServerHTTPTest do
     proto_resp= test_conn.resp_body |> Proto.PongResponse.decode
     assert proto_resp.ping_timestamp == timestamp
     assert proto_resp.pong_timestamp >= timestamp
+  end
+
+  test "/notes/new" do
+    note= Proto.Note.new(
+      uuid:      a_uuid,
+      client_id: a_string,
+      body:      a_string(512)
+    ) |> Proto.put_timestamp
+    req_body= Proto.NoteCreateRequest.new(note: note)
+      |> Proto.put_timestamp
+      |> Proto.NoteCreateRequest.encode
+    test_conn= conn(:post, "/notes/new", req_body)
+                |> MementoServer.HTTP.call(@opts)
+    assert test_conn.status == 200
+    proto_resp= test_conn.resp_body |> Proto.NoteCreateResponse.decode
+    IO.inspect proto_resp
+    assert proto_resp.timestamp > 0
+    assert proto_resp.status_code == :OK
   end
 
 end
