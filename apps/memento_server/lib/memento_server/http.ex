@@ -11,7 +11,7 @@ defmodule MementoServer.HTTP do
   plug :dispatch
   # plug :copy_req_body
 
-  use Plug.Debugger
+  # use Plug.Debugger
 
   #defp copy_req_body(conn, _) do
   #  {:ok, body, _}= Plug.Conn.read_body(conn)

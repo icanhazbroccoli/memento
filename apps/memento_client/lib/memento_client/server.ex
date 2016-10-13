@@ -1,6 +1,6 @@
 defmodule MementoClient.Server do
 
-  alias MementoClient.Proto
+  alias MementoServer.Proto
 
   @server_url  "http://127.0.0.1:9876"
   
@@ -14,21 +14,40 @@ defmodule MementoClient.Server do
   end
 
   def ping(cb) do
-    send_message(Proto.PingRequest.new(), cb)
+    req= Proto.PingRequest.new()
+          |> Proto.put_timestamp(:ping_timestamp)
+          |> Proto.PingRequest.encode
+    send_message("/ping", req, fn resp ->
+      case resp do
+        {:ok, resp_body} ->
+          cb.(resp_body |> Proto.PongResponse.decode)
+        {:error, _} -> cb.(resp)
+      end
+    end)
   end
 
-  def send_data(data, cb) do
-    send_message(data, cb)
+  def create_note(note= %Proto.Note{}, cb) do
+    data= Proto.NoteCreateRequest.new(
+      note: note
+    ) |> Proto.put_timestamp
+      |> Proto.NoteCreateRequest.encode
+    send_message("/notes/new", data, fn resp ->
+      case resp do
+        {:ok, resp_body} ->
+          cb.({:ok, resp_body |> Proto.NoteCreateResponse.decode})
+        {:error, _} -> cb.(resp)
+      end
+    end)
   end
 
   # private functions
 
-  defp send_message(message, cb) do
-    resp= HTTPoison.post(@server_url, :erlang.term_to_binary(message))
+  defp send_message(path, message, cb) do
+    resp= HTTPoison.post("#{@server_url}#{path}", message)
     case resp do
       %HTTPoison.Response{status_code: status, body: body} ->
         # success!
-        cb.({:ok, :erlang.binary_to_term(body)})
+        cb.({:ok, body})
       _ ->
         #too bad
         cb.({:error, resp})

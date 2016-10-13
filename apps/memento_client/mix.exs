@@ -42,6 +42,7 @@ defmodule MementoClient.Mixfile do
       {:exprotobuf, "~> 1.2"},
       {:uuid, "~> 1.1"},
       {:httpoison, "~> 0.9.2"},
+      {:memento_server, in_umbrella: true},
     ]
   end
 end

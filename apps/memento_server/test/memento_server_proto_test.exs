@@ -3,6 +3,19 @@ defmodule MementoServerProtoTest do
 
   alias MementoServer.Proto
 
+  test "encodes uuid" do
+    msg= Proto.Note.new(uuid: UUID.uuid1())
+    assert %Proto.Note{uuid: uuid}= msg
+    assert uuid != nil
+  end
+
+  test "put_uuid generates a uuid" do
+    msg= Proto.Note.new
+          |> Proto.put_uuid
+    assert %Proto.Note{uuid: uuid}= msg
+    assert uuid != nil
+  end
+
   test "put_timestamp/1" do
     msg= %{} |> Proto.put_timestamp
     assert Map.get(msg, :timestamp, 0) > 0

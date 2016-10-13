@@ -35,7 +35,6 @@ defmodule MementoServerHTTPTest do
                 |> MementoServer.HTTP.call(@opts)
     assert test_conn.status == 200
     proto_resp= test_conn.resp_body |> Proto.NoteCreateResponse.decode
-    IO.inspect proto_resp
     assert proto_resp.timestamp > 0
     assert proto_resp.status_code == :OK
   end

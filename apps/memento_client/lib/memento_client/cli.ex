@@ -1,6 +1,6 @@
 defmodule MementoClient.CLI do
 
-  alias MementoClient.Proto
+  alias MementoServer.Proto
   alias MementoClient.Server
 
   def parse_args(args) do
@@ -27,13 +27,15 @@ defmodule MementoClient.CLI do
         acc <> line
       end)
     # FIXME: implement client ID fetching from the app config
-    message= Proto.Note.new(body: body, client_id: "Some dummy client id")
-      |> Proto.put_uuid
+    note= Proto.Note.new(
+      body: body,
+      client_id: "Some dummy client id"
+    ) |> Proto.put_uuid
       |> Proto.put_timestamp
     case Server.is_running? do
       false -> raise "Server seems to be down."
       true  ->
-        Server.send_data(message, fn(resp) ->
+        Server.create_note(note, fn(resp) ->
           IO.inspect resp
         end)
     end
