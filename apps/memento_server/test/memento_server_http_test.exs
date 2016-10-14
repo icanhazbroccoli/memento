@@ -22,6 +22,18 @@ defmodule MementoServerHTTPTest do
     assert proto_resp.pong_timestamp >= timestamp
   end
 
+  test "/notes" do
+    req_body= Proto.NoteListRequest.new(
+      client_id: a_string,
+    ) |> Proto.NoteListRequest.encode
+    test_conn= conn(:post, "/notes", req_body)
+                |> MementoServer.HTTP.call(@opts)
+    assert test_conn.status == 200
+    proto_resp= test_conn.resp_body |> Proto.NoteListResponse.decode
+    assert proto_resp.timestamp > 0
+    assert is_list(proto_resp.notes)
+  end
+
   test "/notes/new" do
     note= Proto.Note.new(
       uuid:      a_uuid,

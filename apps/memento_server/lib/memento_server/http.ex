@@ -20,7 +20,9 @@ defmodule MementoServer.HTTP do
 
   post "/notes" do
     {:ok, body, conn}= Plug.Conn.read_body(conn)
-    #TODO
+    body
+      |> Proto.NoteListRequest.decode
+      |> dispatch_msg(conn)
   end
 
   post "/notes/new" do
@@ -59,6 +61,16 @@ defmodule MementoServer.HTTP do
       |> Proto.NoteCreateResponse.encode
     send_resp(conn, 200, resp)
   end
+
+  def dispatch_msg(req= %Proto.NoteListRequest{}, conn) do
+    #TODO
+    resp= Proto.NoteListResponse.new(
+      notes: [],
+    ) |> Proto.put_timestamp
+      |> Proto.NoteListResponse.encode
+    send_resp(conn, 200, resp)
+  end
+
 
   def dispatch_msg(_, conn) do
     send_resp(conn, 404, "I don't speak your language")
