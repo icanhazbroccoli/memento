@@ -19,7 +19,7 @@ defmodule MementoServer.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :cowboy, :plug],
+      applications: [:logger, :cowboy, :plug, :sqlite_ecto, :ecto],
       mod: {MementoServer, []},
     ]
   end
@@ -43,6 +43,7 @@ defmodule MementoServer.Mixfile do
       {:cowboy, "~> 1.0"},
       {:plug, "~> 1.2"},
       {:uuid, "~> 1.1"},
+      {:sqlite_ecto, "~> 1.1"},
     ]
   end
 end
