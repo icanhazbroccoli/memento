@@ -2,6 +2,7 @@ defmodule MementoServerHTTPTest do
   use ExUnit.Case, async: true
   use Plug.Test
   alias MementoServer.Proto
+  alias MementoServer.Repo
 
   import MementoServer.TestHelper, only: [a_uuid: 0, a_string: 0, a_string: 1]
 
@@ -35,20 +36,32 @@ defmodule MementoServerHTTPTest do
   end
 
   test "/notes/new" do
+    uuid= a_uuid
+    client_id= a_string
+    body= a_string(512)
+
     note= Proto.Note.new(
-      uuid:      a_uuid,
-      client_id: a_string,
-      body:      a_string(512)
+      uuid:      uuid,
+      client_id: client_id,
+      body:      body
     ) |> Proto.put_timestamp
+
     req_body= Proto.NoteCreateRequest.new(note: note)
       |> Proto.put_timestamp
       |> Proto.NoteCreateRequest.encode
+
     test_conn= conn(:post, "/notes/new", req_body)
                 |> MementoServer.HTTP.call(@opts)
+
     assert test_conn.status == 200
     proto_resp= test_conn.resp_body |> Proto.NoteCreateResponse.decode
     assert proto_resp.timestamp > 0
     assert proto_resp.status_code == :OK
+
+    db_note= Repo.get!(MementoServer.Model.Note, uuid)
+    assert db_note.id        == uuid
+    assert db_note.client_id == client_id
+    assert db_note.body      == body
   end
 
 end

@@ -3,10 +3,9 @@ defmodule MementoServer.Repo.Migrations.CreateNotes do
 
   def change do
     create table(:notes, primary_key: false) do
-      add :id, :uuid, primary_key: true
+      add :id,        :uuid,   primary_key: true
       add :client_id, :string
-      add :body, :blob
-      add :timestamp, :integer
+      add :body,      :string
       timestamps
     end
 

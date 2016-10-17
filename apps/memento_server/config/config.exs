@@ -4,8 +4,9 @@ use Mix.Config
 
 config :memento_server, MementoServer.Repo,
   adapter: Sqlite.Ecto,
-  database: "memento.notes"
+  database: "memento.notes.dev"
 
+import_config "#{Mix.env}.exs"
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
@@ -22,9 +23,10 @@ config :memento_server, MementoServer.Repo,
 #     Application.get_env(:memento_server, :key)
 #
 # Or configure a 3rd-party app:
-#
 #     config :logger, level: :info
 #
+
+config :logger, level: :debug
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
