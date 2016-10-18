@@ -27,9 +27,8 @@ defmodule MementoClient.Server do
   end
 
   def create_note(note= %Proto.Note{}, cb) do
-    data= Proto.NoteCreateRequest.new(
-      note: note
-    ) |> Proto.put_timestamp
+    data= Proto.NoteCreateRequest.new(note: note) 
+      |> Proto.put_timestamp
       |> Proto.NoteCreateRequest.encode
     send_message("/notes/new", data, fn resp ->
       case resp do

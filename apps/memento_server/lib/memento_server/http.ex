@@ -66,25 +66,34 @@ defmodule MementoServer.HTTP do
     end
   end
 
-  def dispatch_msg(req= %Proto.NoteListRequest{page: page}, conn) when page < 0 do
-    dispatch_msg(Map.put(req, :page, 0), conn)
+  def dispatch_msg(req= %Proto.NoteListRequest{page: page}, conn) when page < 1 do
+    dispatch_msg(Map.put(req, :page, 1), conn)
   end
+
   def dispatch_msg(req= %Proto.NoteListRequest{page_size: page_size}, conn) when page_size > 100 do
     dispatch_msg(Map.put(req, :page_size, 100), conn)
   end
+
   def dispatch_msg(req= %Proto.NoteListRequest{}, conn) do
-    IO.inspect req
-    notes= Repo.all(
-      from n in MementoServer.Model.Note,
+    notes= Repo.all(from n in MementoServer.Model.Note,
         where:    n.client_id == ^(req.client_id),
         order_by: [desc: n.inserted_at],
         limit:    type(^req.page_size, :integer),
-        offset:   type(^(req.page_size * req.page), :integer)
+        offset:   type(^(req.page_size * (req.page-1)), :integer)
       )
-    resp= Proto.NoteListResponse.new(
-      notes: [],
-    ) |> Proto.put_timestamp
-      |> Proto.NoteListResponse.encode
+      |> Enum.map(fn note ->
+        Proto.Note.new(
+          uuid:      note.id,
+          client_id: note.client_id,
+          timestamp: note.inserted_at
+                      |> Ecto.DateTime.to_erl
+                      |> :calendar.datetime_to_gregorian_seconds,
+          body:      note.body
+        )
+      end)
+    resp= Proto.NoteListResponse.new(notes: notes)
+          |> Proto.put_timestamp
+          |> Proto.NoteListResponse.encode
     send_resp(conn, 200, resp)
   end
 
