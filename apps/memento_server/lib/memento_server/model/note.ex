@@ -11,7 +11,4 @@ defmodule MementoServer.Model.Note do
     timestamps
   end
 
-  # @required_fields ~w(client_id body)
-  # @optional_fields ~w()
-
 end
