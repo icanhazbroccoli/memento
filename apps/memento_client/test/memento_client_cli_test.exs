@@ -1,5 +1,5 @@
 defmodule MementoClient.CLITest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias MementoClient.CLI
 
   test "parse returns command name and argv" do
@@ -10,6 +10,5 @@ defmodule MementoClient.CLITest do
     CLI.parse_args(["--from=README.md"])
       |> CLI.proceed
   end
-
 
 end

@@ -5,51 +5,65 @@ defmodule MementoClient.Server do
   @server_url  "http://127.0.0.1:9876"
   
   def is_running? do
-    #TODO: this works only if the server and
-    # the client are at the same machine.
-    # Should use ping instead for remote
-    # services.
-    # File.exists?(@lock_path)
-    true
+    case ping do
+      {:ok, _} -> true
+      _ -> false
+    end
   end
 
-  def ping(cb) do
-    req= Proto.PingRequest.new()
+  def ping do
+    req= Proto.PingRequest.new(client_id: client_id)
           |> Proto.put_timestamp(:ping_timestamp)
           |> Proto.PingRequest.encode
-    send_message("/ping", req, fn resp ->
-      case resp do
-        {:ok, resp_body} ->
-          cb.(resp_body |> Proto.PongResponse.decode)
-        {:error, _} -> cb.(resp)
-      end
-    end)
+    case resp= send_message("/ping", req) do
+      {:ok, resp_body} ->
+        {:ok, resp_body |> Proto.PongResponse.decode}
+      _ ->
+        {:error, resp}
+    end
+  end
+
+  def client_id do
+    Application.fetch_env!(:memento_client, :client_id)
+  end
+
+  def get_notes(page, _) when page <= 0, do: raise "Page should be >= 1"
+  def get_notes(_, per_page) when per_page <= 0, do: "Per page parameter should be > 0"
+  def get_notes(page, per_page) do
+    req= Proto.NoteListRequest.new(
+      client_id: client_id,
+      page: page,
+      per_page: per_page
+    ) |> Proto.NoteListRequest.encode
+    case resp= send_message("/notes", req) do
+      {:ok, resp_body} ->
+        {:ok, resp_body |> Proto.NoteListResponse.decode}
+      _ ->
+        {:error, resp}
+    end
   end
 
   def create_note(note= %Proto.Note{}, cb) do
-    data= Proto.NoteCreateRequest.new(note: note) 
+    data= Proto.NoteCreateRequest.new(note: note, client_id: client_id) 
       |> Proto.put_timestamp
       |> Proto.NoteCreateRequest.encode
-    send_message("/notes/new", data, fn resp ->
-      case resp do
-        {:ok, resp_body} ->
-          cb.({:ok, resp_body |> Proto.NoteCreateResponse.decode})
-        {:error, _} -> cb.(resp)
-      end
-    end)
+    case resp= send_message("/notes/new", data) do
+      {:ok, resp_body} ->
+        {:ok, resp_body |> Proto.NoteCreateResponse.decode}
+      _ ->
+        {:error, resp}
+    end
   end
 
   # private functions
 
-  defp send_message(path, message, cb) do
+  defp send_message(path, message) do
     resp= HTTPoison.post("#{@server_url}#{path}", message)
     case resp do
       {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
-        # success!
-        cb.({:ok, body})
+        {:ok, body}
       _ ->
-        #too bad
-        cb.({:error, resp})
+        {:error, resp}
     end
   end
 

@@ -5,32 +5,33 @@ enum StatusCode {
   NOT_OK = 2;
 }
 message Note {
-  required string   uuid      = 1;
-  required string   client_id = 2;
-  required sfixed64 timestamp = 3;
-  required string   body      = 4;
+  required string   uuid           = 1;
+  required sfixed64 timestamp      = 2;
+  required string   body           = 3;
 }
 message PingRequest {
-  required sfixed64 ping_timestamp = 1;
+  required string   client_id      = 1;
+  required sfixed64 ping_timestamp = 2;
 }
 message PongResponse {
   required sfixed64 ping_timestamp = 1;
   required sfixed64 pong_timestamp = 2;
 }
 message NoteCreateRequest {
-  required Note     note      = 1;
-  required sfixed64 timestamp = 2;
+  required string   client_id      = 1;
+  required Note     note           = 2;
+  required sfixed64 timestamp      = 3;
 }
 message NoteCreateResponse {
-  required StatusCode status_code = 1;
-  required sfixed64   timestamp   = 2;
+  required StatusCode status_code  = 1;
+  required sfixed64   timestamp    = 2;
 }
 message NoteListRequest {
-  required string client_id = 1;
-  optional int32  page      = 2 [default = 1];
-  optional int32  page_size = 3 [default = 20];
+  required string client_id        = 1;
+  optional int32  page             = 2 [default = 1];
+  optional int32  page_size        = 3 [default = 20];
 }
 message NoteListResponse {
-  repeated Note     notes     = 1;
-  required sfixed64 timestamp = 2;
+  repeated Note     notes          = 1;
+  required sfixed64 timestamp      = 2;
 }

@@ -3,6 +3,7 @@ defmodule MementoServer.HTTP do
   alias MementoServer.Proto
   alias MementoServer.Model
   alias MementoServer.Repo
+  alias MementoServer.ProtoModelBridge, as: Bridge
 
   import Ecto.Query, only: [from: 2]
 
@@ -47,12 +48,11 @@ defmodule MementoServer.HTTP do
     send_resp(conn, 200, resp)
   end
 
-  def dispatch_msg(%Proto.NoteCreateRequest{note: note}, conn) do
-    case %Model.Note{
-      id:        note.uuid,
-      client_id: note.client_id,
-      body:      note.body
-    } |> Repo.insert do
+  def dispatch_msg(req= %Proto.NoteCreateRequest{note: proto_note}, conn) do
+    model_note= Bridge.proto_to_note(proto_note)
+                |> Map.put(:client_id, req.client_id)
+    IO.inspect model_note
+    case Repo.insert(model_note) do
       {:ok, _note} ->
         resp= Proto.NoteCreateResponse.new(
           status_code: Proto.StatusCode.value(:OK)
@@ -82,14 +82,15 @@ defmodule MementoServer.HTTP do
         offset:   type(^(req.page_size * (req.page-1)), :integer)
       )
       |> Enum.map(fn note ->
-        Proto.Note.new(
-          uuid:      note.id,
-          client_id: note.client_id,
-          timestamp: note.inserted_at
-                      |> Ecto.DateTime.to_erl
-                      |> :calendar.datetime_to_gregorian_seconds,
-          body:      note.body
-        )
+        Bridge.note_to_proto(note)
+        # Proto.Note.new(
+        #   uuid:      note.id,
+        #   client_id: note.client_id,
+        #   timestamp: note.inserted_at
+        #               |> Ecto.DateTime.to_erl
+        #               |> :calendar.datetime_to_gregorian_seconds,
+        #   body:      note.body
+        # )
       end)
     resp= Proto.NoteListResponse.new(notes: notes)
           |> Proto.put_timestamp

@@ -8,6 +8,8 @@ use Mix.Config
 # if you want to provide default values for your application for
 # 3rd-party users, it should be done in your "mix.exs" file.
 
+config :memento_client, client_id: "9a050e104eeb86e7c92096e25a14f66deb0a8fc5"
+
 # You can configure for your application as:
 #
 #     config :memento_client, key: :value

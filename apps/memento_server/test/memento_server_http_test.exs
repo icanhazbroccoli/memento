@@ -12,7 +12,8 @@ defmodule MementoServerHTTPTest do
   test "ping proto" do
     time= :calendar.universal_time
     timestamp= time |> :calendar.datetime_to_gregorian_seconds
-    req_body= Proto.PingRequest.new()
+    client_id= a_string
+    req_body= Proto.PingRequest.new(client_id: client_id)
                 |> Proto.put_timestamp(:ping_timestamp, time)
                 |> Proto.PingRequest.encode
     test_conn= conn(:post, "/ping", req_body)
@@ -108,11 +109,10 @@ defmodule MementoServerHTTPTest do
 
     note= Proto.Note.new(
       uuid:      uuid,
-      client_id: client_id,
       body:      body
     ) |> Proto.put_timestamp
 
-    req_body= Proto.NoteCreateRequest.new(note: note)
+    req_body= Proto.NoteCreateRequest.new(note: note, client_id: client_id)
       |> Proto.put_timestamp
       |> Proto.NoteCreateRequest.encode
 
