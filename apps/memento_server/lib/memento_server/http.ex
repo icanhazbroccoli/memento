@@ -53,9 +53,10 @@ defmodule MementoServer.HTTP do
                 |> Map.put(:client_id, req.client_id)
     IO.inspect model_note
     case Repo.insert(model_note) do
-      {:ok, _note} ->
+      {:ok, note} ->
         resp= Proto.NoteCreateResponse.new(
-          status_code: Proto.StatusCode.value(:OK)
+          status_code: Proto.StatusCode.value(:OK),
+          note_id: note.id
         ) |> Proto.put_timestamp
           |> Proto.NoteCreateResponse.encode
         send_resp(conn, 200, resp)
@@ -83,14 +84,6 @@ defmodule MementoServer.HTTP do
       )
       |> Enum.map(fn note ->
         Bridge.note_to_proto(note)
-        # Proto.Note.new(
-        #   uuid:      note.id,
-        #   client_id: note.client_id,
-        #   timestamp: note.inserted_at
-        #               |> Ecto.DateTime.to_erl
-        #               |> :calendar.datetime_to_gregorian_seconds,
-        #   body:      note.body
-        # )
       end)
     resp= Proto.NoteListResponse.new(notes: notes)
           |> Proto.put_timestamp

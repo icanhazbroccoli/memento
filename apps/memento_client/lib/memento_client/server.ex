@@ -43,7 +43,7 @@ defmodule MementoClient.Server do
     end
   end
 
-  def create_note(note= %Proto.Note{}, cb) do
+  def create_note(note= %Proto.Note{}) do
     data= Proto.NoteCreateRequest.new(note: note, client_id: client_id) 
       |> Proto.put_timestamp
       |> Proto.NoteCreateRequest.encode
