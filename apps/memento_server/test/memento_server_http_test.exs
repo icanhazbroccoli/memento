@@ -130,4 +130,26 @@ defmodule MementoServerHTTPTest do
     assert db_note.body      == body
   end
 
+  @tag :get_note
+  test "/notes/get with an existing note and full uuid" do
+    client_id= a_string
+    uuid= a_uuid
+    note= %Model.Note{ id: uuid, client_id: client_id, body: a_string(512) }
+    {:ok, model_note}= note |> Repo.insert
+    req_body= Proto.NoteGetRequest.new(
+      client_id: client_id,
+      note_id: uuid,
+    ) |> Proto.put_timestamp
+      |> Proto.NoteGetRequest.encode
+
+    test_conn= conn(:post, "/notes/get", req_body)
+                |> MementoServer.HTTP.call(@opts)
+
+    assert test_conn.status == 200
+    proto_resp= test_conn.resp_body |> Proto.NoteGetResponse.decode
+    assert proto_resp.timestamp > 0
+    assert proto_resp.status_code == :OK
+    assert %Proto.Note{}= proto_resp.note
+  end
+
 end

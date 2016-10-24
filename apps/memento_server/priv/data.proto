@@ -4,6 +4,12 @@ enum StatusCode {
   OK     = 1;
   NOT_OK = 2;
 }
+enum DisambiguationStrategy {
+  FIRST  = 1;
+  ANY    = 2;
+  NONE   = 3;
+  THROW  = 4;
+}
 message Note {
   required string   uuid           = 1;
   required sfixed64 timestamp      = 2;
@@ -35,4 +41,15 @@ message NoteListRequest {
 message NoteListResponse {
   repeated Note     notes          = 1;
   required sfixed64 timestamp      = 2;
+}
+message NoteGetRequest {
+  required string client_id        = 1;
+  required string note_id       = 2;
+  optional DisambiguationStrategy strategy = 3 [default = FIRST];
+}
+message NoteGetResponse {
+  optional Note       note         = 1;
+  required StatusCode status_code  = 2;
+  required sfixed64   timestamp    = 3;
+  optional string     status_message = 4;
 }

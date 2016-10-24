@@ -32,6 +32,13 @@ defmodule MementoServer.HTTP do
       |> dispatch_msg(conn)
   end
 
+  post "/notes/get" do
+    {:ok, body, conn}= Plug.Conn.read_body(conn)
+    body
+      |> Proto.NoteGetRequest.decode
+      |> dispatch_msg(conn)
+  end
+
   post "/ping" do
     {:ok, body, conn}= Plug.Conn.read_body(conn)
     body
@@ -76,7 +83,7 @@ defmodule MementoServer.HTTP do
   end
 
   def dispatch_msg(req= %Proto.NoteListRequest{}, conn) do
-    notes= Repo.all(from n in MementoServer.Model.Note,
+    notes= Repo.all(from n in Model.Note,
         where:    n.client_id == ^(req.client_id),
         order_by: [desc: n.inserted_at],
         limit:    type(^req.page_size, :integer),
@@ -89,6 +96,27 @@ defmodule MementoServer.HTTP do
           |> Proto.put_timestamp
           |> Proto.NoteListResponse.encode
     send_resp(conn, 200, resp)
+  end
+
+  def dispatch_msg(req= %Proto.NoteGetRequest{}, conn) do
+    note= Repo.get_by(Model.Note, id: req.note_id, client_id: req.client_id)
+    case note do
+      nil ->
+        resp= Proto.NoteGetResponse.new(
+          status_code: Proto.StatusCode.value(:NOT_OK),
+          status_message: "Not found"
+        ) |> Proto.put_timestamp
+          |> Proto.NoteGetResponse.encode
+        send_resp(conn, 404, resp)
+      _ ->
+        proto_note= Bridge.note_to_proto(note)
+        resp= Proto.NoteGetResponse.new(
+          note: proto_note,
+          status_code: Proto.StatusCode.value(:OK),
+        ) |> Proto.put_timestamp
+          |> Proto.NoteGetResponse.encode
+        send_resp(conn, 200, resp)
+    end
   end
 
   def dispatch_msg(_, conn) do
