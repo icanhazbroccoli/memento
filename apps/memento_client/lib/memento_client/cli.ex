@@ -35,8 +35,13 @@ defmodule MementoClient.CLI do
     case Server.is_running? do
       false -> raise "Server seems to be down."
       true ->
-        {:ok, resp}= Server.get_note(note_id)
-        IO.inspect resp
+        {:ok, note}= Server.get_note(note_id)
+        time= note.timestamp
+                |> :calendar.gregorian_seconds_to_datetime
+                |> inspect
+        IO.puts "Note: #{note.uuid}"
+        IO.puts "Created: #{time}"
+        IO.puts "\n#{note.body}\n"
     end
   end
 
