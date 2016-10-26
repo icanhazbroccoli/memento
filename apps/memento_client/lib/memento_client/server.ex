@@ -43,6 +43,19 @@ defmodule MementoClient.Server do
     end
   end
 
+  def get_note(note_id) do
+    req= Proto.NoteGetRequest.new(
+      client_id: client_id,
+      note_id:   note_id
+    ) |> Proto.NoteGetRequest.encode
+    case resp= send_message("/notes/get", req) do
+      {:ok, resp_body} ->
+        {:ok, resp_body |> Proto.NoteGetResponse.decode |> Map.get(:note)}
+      _ ->
+        {:error, resp}
+    end
+  end
+
   def create_note(note= %Proto.Note{}) do
     data= Proto.NoteCreateRequest.new(note: note, client_id: client_id) 
       |> Proto.put_timestamp

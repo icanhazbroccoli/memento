@@ -44,7 +44,7 @@ message NoteListResponse {
 }
 message NoteGetRequest {
   required string client_id        = 1;
-  required string note_id       = 2;
+  required string note_id          = 2;
   optional DisambiguationStrategy strategy = 3 [default = FIRST];
 }
 message NoteGetResponse {

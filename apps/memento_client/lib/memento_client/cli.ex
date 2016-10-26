@@ -31,6 +31,15 @@ defmodule MementoClient.CLI do
     end
   end
 
+  def proceed({opts, ["get", note_id | _tail]}) do
+    case Server.is_running? do
+      false -> raise "Server seems to be down."
+      true ->
+        {:ok, resp}= Server.get_note(note_id)
+        IO.inspect resp
+    end
+  end
+
   def proceed({opts, []}) do
     {from, opts}= Keyword.pop(opts, :from)
     stream= case from do
