@@ -6,9 +6,9 @@ defmodule MementoClient.CLI do
   def parse_args(argv) do
     {parsed, args, _invalid}= argv
       |> OptionParser.parse(
-        switcehs: [
-          from: :string,
-          page: :integer,
+        switches: [
+          from:     :string,
+          page:     :integer,
           per_page: :integer,
         ]
       )

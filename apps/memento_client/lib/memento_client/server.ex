@@ -33,7 +33,7 @@ defmodule MementoClient.Server do
     req= Proto.NoteListRequest.new(
       client_id: client_id,
       page: page,
-      per_page: per_page
+      page_size: per_page
     ) |> Proto.NoteListRequest.encode
     case resp= send_message("/notes", req) do
       {:ok, resp_body} ->
