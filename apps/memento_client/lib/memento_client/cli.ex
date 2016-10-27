@@ -24,7 +24,7 @@ defmodule MementoClient.CLI do
         {:ok, resp}= Server.get_notes(page, per_page)
         resp.notes
           |> Enum.map(fn note ->
-            "* #{short_id note.uuid}\t#{short_note(note)}"
+            "* #{note.uuid}\t#{short_note(note)}"
           end)
           |> Enum.join("\n")
           |> IO.puts
