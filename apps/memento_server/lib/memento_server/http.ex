@@ -99,16 +99,14 @@ defmodule MementoServer.HTTP do
   end
 
   def dispatch_msg(req= %Proto.NoteGetRequest{}, conn) do
-    note= Repo.get_by(Model.Note, id: req.note_id, client_id: req.client_id)
+    note= try do
+      Repo.get_by!(Model.Note, id: req.note_id, client_id: req.client_id)
+    rescue
+      e in Ecto.CastError -> e
+    end
+
     case note do
-      nil ->
-        resp= Proto.NoteGetResponse.new(
-          status_code: Proto.StatusCode.value(:NOT_OK),
-          status_message: "Not found"
-        ) |> Proto.put_timestamp
-          |> Proto.NoteGetResponse.encode
-        send_resp(conn, 404, resp)
-      _ ->
+      %Model.Note{} ->
         proto_note= Bridge.note_to_proto(note)
         resp= Proto.NoteGetResponse.new(
           note: proto_note,
@@ -116,6 +114,13 @@ defmodule MementoServer.HTTP do
         ) |> Proto.put_timestamp
           |> Proto.NoteGetResponse.encode
         send_resp(conn, 200, resp)
+      _ ->
+        resp= Proto.NoteGetResponse.new(
+          status_code: Proto.StatusCode.value(:NOT_OK),
+          status_message: "Not found"
+        ) |> Proto.put_timestamp
+          |> Proto.NoteGetResponse.encode
+        send_resp(conn, 404, resp)
     end
   end
 

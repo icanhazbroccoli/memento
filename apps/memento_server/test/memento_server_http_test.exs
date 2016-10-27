@@ -152,4 +152,23 @@ defmodule MementoServerHTTPTest do
     assert %Proto.Note{}= proto_resp.note
   end
 
+  @tag :get_note
+  test "/notes/get with a non-existing id" do
+    client_id= a_string
+    fake_uuid= a_string(8) # Guaranteed to be non-existing
+    req_body= Proto.NoteGetRequest.new(
+      client_id: client_id,
+      note_id: fake_uuid
+    ) |> Proto.put_timestamp
+      |> Proto.NoteGetRequest.encode
+
+    test_conn= conn(:post, "/notes/get", req_body)
+                |> MementoServer.HTTP.call(@opts)
+
+    assert test_conn.status == 404
+    proto_resp= test_conn.resp_body |> Proto.NoteGetResponse.decode
+    assert proto_resp.status_code == :NOT_OK
+  end
+
+
 end

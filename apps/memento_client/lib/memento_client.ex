@@ -3,6 +3,6 @@ defmodule MementoClient do
   def main(args) do
     args
       |> CLI.parse_args
-      |> CLI.process
+      |> CLI.proceed
   end
 end
