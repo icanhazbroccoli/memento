@@ -35,13 +35,18 @@ defmodule MementoClient.CLI do
     case Server.is_running? do
       false -> raise "Server seems to be down."
       true ->
-        {:ok, note}= Server.get_note(note_id)
-        time= note.timestamp
-                |> :calendar.gregorian_seconds_to_datetime
-                |> inspect
-        IO.puts "Note: #{note.uuid}"
-        IO.puts "Created: #{time}"
-        IO.puts "\n#{note.body}\n"
+        case Server.get_note(note_id) do
+          {:ok, nil} ->
+            #TODO
+            IO.puts "Note with id #{note_id} does not exist"
+          {:ok, note} ->
+            time= note.timestamp
+                    |> :calendar.gregorian_seconds_to_datetime
+                    |> inspect
+            IO.puts "Note: #{note.uuid}"
+            IO.puts "Created: #{time}"
+            IO.puts "\n#{note.body}\n"
+        end
     end
   end
 
@@ -64,7 +69,7 @@ defmodule MementoClient.CLI do
       false -> raise "Server seems to be down."
       true  ->
         {:ok, resp}= Server.create_note(note)
-        IO.puts "A new note with id #{short_id resp.note_id} was created"
+        IO.puts "A new note with id #{resp.note_id} was created"
     end
   end
 

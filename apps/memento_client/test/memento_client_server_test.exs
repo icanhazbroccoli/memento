@@ -25,9 +25,7 @@ defmodule MementoClientServerTest do
   end
 
   test "get note with non-existing uuid" do
-    resp= Server.get_note("asdasdasd")
-    IO.inspect resp
+    assert {:ok, nil} == Server.get_note("asdasdasd")
   end
-
 
 end
