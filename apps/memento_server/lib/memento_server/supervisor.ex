@@ -8,6 +8,7 @@ defmodule MementoServer.Supervisor do
   def init([]) do
     children= [
       worker(MementoServer.Repo, []),
+      worker(MementoServer.ClockSupervisor, [0]),
       Plug.Adapters.Cowboy.child_spec(:http, MementoServer.HTTP, [], [port: 9876]),
     ]
     supervise(children, strategy: :one_for_one)

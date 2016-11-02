@@ -2,14 +2,17 @@ defmodule MementoClient.Server do
 
   alias MementoServer.Proto
 
-  @server_url  "http://127.0.0.1:9876"
-  
   def is_running? do
     case ping do
       {:ok, _} -> true
       _ -> false
     end
   end
+
+  def server_url do
+    "http://127.0.0.1:9876"
+  end
+
 
   def ping do
     req= Proto.PingRequest.new(client_id: client_id)
@@ -71,7 +74,7 @@ defmodule MementoClient.Server do
   # private functions
 
   defp send_message(path, message) do
-    resp= HTTPoison.post("#{@server_url}#{path}", message)
+    resp= HTTPoison.post("#{server_url}#{path}", message)
     case resp do
       {:ok, %HTTPoison.Response{status_code: status, body: body}} ->
         {:ok, body}
