@@ -2,13 +2,13 @@ defmodule MementoServer.ClockSupervisor do
 
   use Supervisor
 
-  def start_link(time) do
-    Supervisor.start_link(__MODULE__, time)
+  def start_link() do
+    Supervisor.start_link(__MODULE__, [])
   end
 
-  def init(time) do
+  def init([]) do
     children= [
-      worker(MementoServer.Clock, [time])
+      worker(MementoServer.Clock, [%{}])
     ]
     supervise(children, strategy: :one_for_one)
   end
