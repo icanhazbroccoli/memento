@@ -24,7 +24,8 @@ defmodule MementoServerClockTest do
     assert %{:a => 1, :b => 2}= res
     res2= Clock.update_time(%{a: 2, b: 1})
     assert %{:a => 2, :b => 2}= res2
+    res3= Clock.update_time(%{a: 3, c: 1})
+    assert %{:a => 3, :b => 2, :c => 1}= res3
   end
-
 
 end

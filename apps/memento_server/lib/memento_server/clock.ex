@@ -30,12 +30,12 @@ defmodule MementoServer.Clock do
   end
 
   def handle_call({:update_time, vector1}, _from, vector2) do
-    vector= Map.merge(vector1, vector2, fn(_k, v1, v2) ->
+    {_, vector}= Map.merge(vector1, vector2, fn(_k, v1, v2) ->
       case v1 > v2 do
         true  -> v1
         false -> v2
       end
-    end)
+    end) |> Map.get_and_update(Node.self, fn v -> {v, v + 1} end)
     {:reply, vector, vector}
   end
 

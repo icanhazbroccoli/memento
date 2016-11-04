@@ -53,3 +53,17 @@ message NoteGetResponse {
   required sfixed64   timestamp    = 3;
   optional string     status_message = 4;
 }
+message Clock {
+  required string key   = 1;
+  required int64  value = 2;
+}
+message VectorClock {
+  repeated Clock clocks = 1;
+}
+message UpdateRequest {
+  required VectorClock vector_clock = 1;
+}
+message UpdateResponse {
+  required VectorClock vector_clock = 1;
+  repeated Note        notes        = 2;
+}
