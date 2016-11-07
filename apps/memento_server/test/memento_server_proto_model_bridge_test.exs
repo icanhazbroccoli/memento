@@ -57,5 +57,4 @@ defmodule MementoServerProtoModelBridgeTest do
     }
   end
 
-
 end
