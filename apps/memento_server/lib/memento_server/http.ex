@@ -46,6 +46,13 @@ defmodule MementoServer.HTTP do
       |> dispatch_msg(conn)
   end
 
+  post "/update" do
+    {:ok, body, conn}= Plug.Conn.read_body(conn)
+    body
+      |> UpdateRequest.decode
+      |> dispatch_msg(conn)
+  end
+
   def dispatch_msg(req= %Proto.PingRequest{ping_timestamp: ping_timestamp}, conn) do
     pong_timestamp= :calendar.universal_time
     resp= Proto.PongResponse.new()
@@ -58,7 +65,6 @@ defmodule MementoServer.HTTP do
   def dispatch_msg(req= %Proto.NoteCreateRequest{note: proto_note}, conn) do
     model_note= Bridge.proto_to_note(proto_note)
                 |> Map.put(:client_id, req.client_id)
-    IO.inspect model_note
     case Repo.insert(model_note) do
       {:ok, note} ->
         resp= Proto.NoteCreateResponse.new(
@@ -122,6 +128,11 @@ defmodule MementoServer.HTTP do
           |> Proto.NoteGetResponse.encode
         send_resp(conn, 404, resp)
     end
+  end
+
+  def dispatch_msg(req= %Proto.UpdateRequest{}, conn) do
+    clock= Bridge.vector_clock_to_map(req.vector_clock)
+    #TODO
   end
 
   def dispatch_msg(_, conn) do

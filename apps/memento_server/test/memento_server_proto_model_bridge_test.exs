@@ -37,5 +37,25 @@ defmodule MementoServerProtoModelBridgeTest do
     }
   end
 
+  test "vector_clock_to_map" do
+    vector_clock= Proto.VectorClock.new(
+      clocks: [
+        Proto.Clock.new( key: :a, value: 1 ),
+        Proto.Clock.new( key: :b, value: 2 ),
+      ]
+    )
+    assert Bridge.vector_clock_to_map(vector_clock) == %{ a: 1, b: 2 }
+  end
+
+  test "map_to_vector_clock" do
+    map= %{ a: 1, b: 2 }
+    assert Bridge.map_to_vector_clock(map) == %Proto.VectorClock{
+      clocks: [
+        %Proto.Clock{ key: :a, value: 1 },
+        %Proto.Clock{ key: :b, value: 2 },
+      ]
+    }
+  end
+
 
 end

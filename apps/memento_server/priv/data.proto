@@ -65,5 +65,6 @@ message UpdateRequest {
 }
 message UpdateResponse {
   required VectorClock vector_clock = 1;
-  repeated Note        notes        = 2;
+  required sfixed64    timestamp    = 2;
+  repeated Note        notes        = 3;
 }

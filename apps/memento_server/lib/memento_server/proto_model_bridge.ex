@@ -22,4 +22,16 @@ defmodule MementoServer.ProtoModelBridge do
     }
   end
 
+  def vector_clock_to_map(%Proto.VectorClock{ clocks: clocks }) do
+    clocks
+      |> Enum.map(fn %Proto.Clock{ key: key, value: value } -> {key, value} end)
+      |> Enum.into(%{})
+  end
+
+  def map_to_vector_clock(map) do
+    Proto.VectorClock.new(
+      clocks: map |> Enum.map( fn {k, v} -> Proto.Clock.new( key: k, value: v ) end ) 
+    )
+  end
+
 end
